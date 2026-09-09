@@ -6,61 +6,30 @@ caract = pd.read_csv("data/raw/caract-2024.csv", sep=";")
 lieux = pd.read_csv("data/raw/lieux-2024.csv", sep=";")
 usagers = pd.read_csv("data/raw/usagers-2024.csv", sep=";")
 
-# Sélection des colonnes utiles pour l'analyse
 
+# Sélection des colonnes utiles
 caract = caract[
-    [
-        "Num_Acc",
-        "jour",
-        "mois",
-        "hrmn",
-        "lum",
-        "agg",
-        "atm"
-    ]
+    ["Num_Acc", "jour", "mois", "hrmn", "lum", "agg", "atm"]
 ]
 
 lieux = lieux[
-    [
-        "Num_Acc",
-        "catr",
-        "surf",
-        "vma"
-    ]
+    ["Num_Acc", "catr", "surf", "vma"]
 ]
 
 usagers = usagers[
-    [
-        "Num_Acc",
-        "grav",
-        "sexe",
-        "an_nais",
-        "catu"
-    ]
+    ["Num_Acc", "grav", "sexe", "an_nais", "catu"]
 ]
-# Création de l'âge des usagers à partir de l'année de naissance
+
+
+# Création de l'âge à partir de l'année de naissance
 usagers["age"] = 2024 - usagers["an_nais"]
 
-# Vérification des premières valeurs
-print("\nAperçu des âges :")
-print(usagers[["an_nais", "age"]].head())
 
-# Vérification des valeurs manquantes
-print("\nValeurs manquantes pour l'âge :")
-print(usagers["age"].isnull().sum())
-
-# Création du dataset principal au niveau de l'accident
-
+# Création du dataset des accidents
 accidents = caract.copy()
 
-print("\nInformations sur le dataset accidents :")
-print(accidents.shape)
 
-print("\nNombre d'accidents uniques :")
-print(accidents["Num_Acc"].nunique())
-
-# Ajout du type de route au dataset accidents
-
+# Ajout du type de route
 lieux_catr = lieux[["Num_Acc", "catr"]].drop_duplicates()
 
 accidents = accidents.merge(
@@ -69,38 +38,19 @@ accidents = accidents.merge(
     how="left"
 )
 
-print("\nDataset accidents après ajout de catr :")
-print(accidents.shape)
 
-print("Nombre d'accidents uniques :")
-print(accidents["Num_Acc"].nunique())
-
-# Création du dataset au niveau des usagers
-# Une ligne représente un usager impliqué dans un accident
-
+# Création du dataset des usagers
 usagers_prepares = usagers.copy()
 
-# Ajout des informations générales de l'accident à chaque usager
+# Ajout des informations de l'accident
 usagers_prepares = usagers_prepares.merge(
     accidents,
     on="Num_Acc",
     how="left"
 )
 
-# Vérification du résultat
-print("\nDataset usagers préparé :")
-print(usagers_prepares.shape)
 
-print("Nombre d'usagers :", len(usagers_prepares))
-print("Nombre d'accidents uniques :", usagers_prepares["Num_Acc"].nunique())
-
-# Vérification des valeurs des variables codées
-
-variables_accidents = ["lum", "agg", "atm", "catr"]
-variables_usagers = ["grav", "sexe", "catu"]
-
-# Dictionnaire des conditions de luminosité
-
+# Conditions de luminosité
 luminosite = {
     1: "Plein jour",
     2: "Crépuscule ou aube",
@@ -109,12 +59,11 @@ luminosite = {
     5: "Nuit avec éclairage public allumé"
 }
 
-# Création d'une colonne descriptive
 accidents["lum_label"] = accidents["lum"].map(luminosite)
 usagers_prepares["lum_label"] = usagers_prepares["lum"].map(luminosite)
 
-# Dictionnaire des conditions atmosphériques
 
+# Conditions atmosphériques
 atmosphere = {
     1: "Normale",
     2: "Pluie légère",
@@ -127,23 +76,21 @@ atmosphere = {
     9: "Autre"
 }
 
-# Création d'une colonne descriptive
 accidents["atm_label"] = accidents["atm"].map(atmosphere)
 usagers_prepares["atm_label"] = usagers_prepares["atm"].map(atmosphere)
 
-# Dictionnaire agglomération / hors agglomération
 
+# Agglomération
 agglomeration = {
     1: "Hors agglomération",
     2: "En agglomération"
 }
 
-# Création d'une colonne descriptive
 accidents["agg_label"] = accidents["agg"].map(agglomeration)
 usagers_prepares["agg_label"] = usagers_prepares["agg"].map(agglomeration)
 
-# Dictionnaire des catégories de routes
 
+# Catégorie de route
 categorie_route = {
     1: "Autoroute",
     2: "Route nationale",
@@ -155,12 +102,11 @@ categorie_route = {
     9: "Autre"
 }
 
-# Création d'une colonne descriptive
 accidents["catr_label"] = accidents["catr"].map(categorie_route)
 usagers_prepares["catr_label"] = usagers_prepares["catr"].map(categorie_route)
 
-# Dictionnaire des niveaux de gravité
 
+# Niveau de gravité
 gravite = {
     1: "Indemne",
     2: "Tué",
@@ -168,35 +114,38 @@ gravite = {
     4: "Blessé léger"
 }
 
-# Création d'une colonne descriptive
 usagers_prepares["grav_label"] = usagers_prepares["grav"].map(gravite)
 
-# Dictionnaire du sexe des usagers
 
-sexe_label = {
+# Sexe des usagers
+sexe_labels = {
+    -1: "Non renseigné",
     1: "Masculin",
-    2: "Féminin",
-    -1: "Non renseigné"
+    2: "Féminin"
 }
 
-# Création d'une colonne descriptive
-usagers_prepares["sexe_label"] = usagers_prepares["sexe"].map(sexe_label)
+usagers_prepares["sexe_label"] = usagers_prepares["sexe"].map(sexe_labels)
 
-# Dictionnaire des catégories d'usagers
 
+# Catégorie d'usager
 categorie_usager = {
     1: "Conducteur",
     2: "Passager",
     3: "Piéton"
 }
 
-# Création d'une colonne descriptive
 usagers_prepares["catu_label"] = usagers_prepares["catu"].map(categorie_usager)
 
-# Vérification
-print("\nCatégories d'usagers :")
-print(
-    usagers_prepares[["catu", "catu_label"]]
-    .drop_duplicates()
-    .sort_values("catu")
+
+# Sauvegarde des données préparées
+accidents.to_csv(
+    "data/processed/accidents_prepares.csv",
+    index=False
 )
+
+usagers_prepares.to_csv(
+    "data/processed/usagers_prepares.csv",
+    index=False
+)
+
+print("Données préparées et sauvegardées avec succès.")
