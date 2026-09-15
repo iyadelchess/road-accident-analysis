@@ -1,4 +1,5 @@
 import pandas as pd
+import joblib
 from sklearn.model_selection import train_test_split
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder
@@ -118,6 +119,7 @@ print("\nMatrice de confusion :")
 print(confusion_matrix(y_test, predictions_arbre))
 
 # Création du modèle Random Forest
+
 modele_foret = Pipeline(
     steps=[
         ("preprocessing", preprocesseur),
@@ -134,14 +136,26 @@ modele_foret = Pipeline(
 )
 
 # Entraînement du modèle
+
 modele_foret.fit(X_train, y_train)
 
 print("\nModèle Random Forest entraîné avec succès.")
 
+# Sauvegarde du modèle entraîné
+
+joblib.dump(
+    modele_foret,
+    "models/modele_random_forest.pkl"
+)
+
+print("Modèle Random Forest sauvegardé.")
+
 # Prédictions
+
 predictions_foret = modele_foret.predict(X_test)
 
 # Évaluation
+
 print("Accuracy :", accuracy_score(y_test, predictions_foret))
 
 print("\nRapport de classification :")
@@ -163,3 +177,33 @@ if accuracy_foret > accuracy_arbre:
     print("Le Random Forest obtient la meilleure accuracy.")
 else:
     print("Le Decision Tree obtient la meilleure accuracy.")
+
+# Exemple de prédiction sur un usager
+
+exemple = X_test.iloc[[0]]
+gravite_reelle = y_test.iloc[0]
+
+prediction = modele_foret.predict(exemple)[0]
+
+labels_gravite = {
+    1: "Indemne",
+    2: "Tué",
+    3: "Blessé hospitalisé",
+    4: "Blessé léger"
+}
+
+print("\n--- Exemple de prédiction ---")
+
+print("Caractéristiques de l'usager :")
+print("Âge :", exemple["age"].iloc[0])
+print("Sexe :", exemple["sexe"].iloc[0])
+print("Heure :", exemple["heure"].iloc[0])
+print("Catégorie :", exemple["catu"].iloc[0])
+
+print("\nGravité réelle :", labels_gravite[gravite_reelle])
+print("Gravité prédite :", labels_gravite[prediction])
+
+if prediction == gravite_reelle:
+    print("La machine a raison.")
+else:
+    print("La machine s'est trompée.")

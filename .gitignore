@@ -16,4 +16,4 @@ env/
 
 # Operating system
 .DS_Store
-Thumbs.db
+Thumbs.dbmodels/*.pkl 
