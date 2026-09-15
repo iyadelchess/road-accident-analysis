@@ -4,6 +4,8 @@ from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.pipeline import Pipeline
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+from sklearn.ensemble import RandomForestClassifier
 
 # Chargement des données préparées
 
@@ -100,3 +102,50 @@ modele_arbre = Pipeline(
 modele_arbre.fit(X_train, y_train)
 
 print("Modèle Decision Tree entraîné avec succès.")
+
+# Prédictions sur les données de test
+
+predictions_arbre = modele_arbre.predict(X_test)
+
+# Évaluation du modèle
+
+print("Accuracy :", accuracy_score(y_test, predictions_arbre))
+
+print("\nRapport de classification :")
+print(classification_report(y_test, predictions_arbre))
+
+print("\nMatrice de confusion :")
+print(confusion_matrix(y_test, predictions_arbre))
+
+# Création du modèle Random Forest
+modele_foret = Pipeline(
+    steps=[
+        ("preprocessing", preprocesseur),
+        (
+            "model",
+            RandomForestClassifier(
+                n_estimators=100,
+                class_weight="balanced",
+                random_state=42,
+                n_jobs=-1
+            )
+        )
+    ]
+)
+
+# Entraînement du modèle
+modele_foret.fit(X_train, y_train)
+
+print("\nModèle Random Forest entraîné avec succès.")
+
+# Prédictions
+predictions_foret = modele_foret.predict(X_test)
+
+# Évaluation
+print("Accuracy :", accuracy_score(y_test, predictions_foret))
+
+print("\nRapport de classification :")
+print(classification_report(y_test, predictions_foret))
+
+print("\nMatrice de confusion :")
+print(confusion_matrix(y_test, predictions_foret))
