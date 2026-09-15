@@ -149,3 +149,17 @@ print(classification_report(y_test, predictions_foret))
 
 print("\nMatrice de confusion :")
 print(confusion_matrix(y_test, predictions_foret))
+
+# Comparaison des modèles
+
+accuracy_arbre = accuracy_score(y_test, predictions_arbre)
+accuracy_foret = accuracy_score(y_test, predictions_foret)
+
+print("\nComparaison des modèles :")
+print("Decision Tree :", round(accuracy_arbre, 3))
+print("Random Forest :", round(accuracy_foret, 3))
+
+if accuracy_foret > accuracy_arbre:
+    print("Le Random Forest obtient la meilleure accuracy.")
+else:
+    print("Le Decision Tree obtient la meilleure accuracy.")
