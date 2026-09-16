@@ -1,3 +1,7 @@
+# Auteur : El Cheriaa El Manssouri Iyad
+# Projet : Road Accident Analysis
+# Description : Analyse et prédiction de la gravité des accidents routiers
+
 import pandas as pd
 import joblib
 from sklearn.model_selection import train_test_split
