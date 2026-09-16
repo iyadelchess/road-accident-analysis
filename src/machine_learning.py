@@ -177,33 +177,3 @@ if accuracy_foret > accuracy_arbre:
     print("Le Random Forest obtient la meilleure accuracy.")
 else:
     print("Le Decision Tree obtient la meilleure accuracy.")
-
-# Exemple de prédiction sur un usager
-
-exemple = X_test.iloc[[0]]
-gravite_reelle = y_test.iloc[0]
-
-prediction = modele_foret.predict(exemple)[0]
-
-labels_gravite = {
-    1: "Indemne",
-    2: "Tué",
-    3: "Blessé hospitalisé",
-    4: "Blessé léger"
-}
-
-print("\n--- Exemple de prédiction ---")
-
-print("Caractéristiques de l'usager :")
-print("Âge :", exemple["age"].iloc[0])
-print("Sexe :", exemple["sexe"].iloc[0])
-print("Heure :", exemple["heure"].iloc[0])
-print("Catégorie :", exemple["catu"].iloc[0])
-
-print("\nGravité réelle :", labels_gravite[gravite_reelle])
-print("Gravité prédite :", labels_gravite[prediction])
-
-if prediction == gravite_reelle:
-    print("La machine a raison.")
-else:
-    print("La machine s'est trompée.")
