@@ -1,5 +1,6 @@
 import pandas as pd
 import joblib
+from sklearn.model_selection import train_test_split
 
 # Chargement du modèle Random Forest déjà entraîné
 
@@ -15,42 +16,62 @@ usagers = pd.read_csv(
     "data/processed/usagers_prepares.csv"
 )
 
+# Sélection des variables utilisées par le modèle
 
-# Sélection d'un usager pour le test
+variables = [
+    "age",
+    "sexe",
+    "catu",
+    "jour",
+    "mois",
+    "hrmn",
+    "lum",
+    "agg",
+    "atm",
+    "catr"
+]
 
-exemple = usagers.iloc[[0]].copy()
+cible = "grav"
+
+data_ml = usagers[variables + [cible]].copy()
+
+# Suppression des lignes avec des valeurs manquantes
+
+data_ml = data_ml.dropna()
+
+# Extraction de l'heure à partir de hrmn
+
+data_ml["heure"] = pd.to_datetime(
+    data_ml["hrmn"],
+    format="%H:%M"
+).dt.hour
+
+# Séparation des variables d'entrée et de la cible
+
+X = data_ml.drop(columns=["grav", "hrmn"])
+y = data_ml["grav"]
+
+# Même séparation que lors de l'entraînement
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.2,
+    random_state=42,
+    stratify=y
+)
+
+# Sélection d'un usager du jeu de test
+
+exemple = X_test.iloc[[0]]
+gravite_reelle = y_test.iloc[0]
 
 print("\n--- Usager testé ---")
 print(exemple)
 
-# Préparation des variables pour le modèle
-
-exemple["heure"] = pd.to_datetime(
-    exemple["hrmn"],
-    format="%H:%M"
-).dt.hour
-
-X_exemple = exemple[
-    [
-        "age",
-        "sexe",
-        "catu",
-        "jour",
-        "mois",
-        "heure",
-        "lum",
-        "agg",
-        "atm",
-        "catr"
-    ]
-]
-
-
 # Prédiction
 
-prediction = modele.predict(X_exemple)[0]
-
-print("\nGravité prédite :", prediction)
+prediction = modele.predict(exemple)[0]
 
 # Traduction de la gravité
 
@@ -60,8 +81,6 @@ labels_gravite = {
     3: "Blessé hospitalisé",
     4: "Blessé léger"
 }
-
-gravite_reelle = exemple["grav"].iloc[0]
 
 print("\n--- Résultat ---")
 print("Gravité réelle :", labels_gravite[gravite_reelle])
