@@ -104,7 +104,6 @@ road-accident-analysis/
 │   ├── prepare_data.py
 │   └── test_prediction.py
 │
-├── visualizations/
 │
 ├── .gitignore
 ├── README.md
@@ -448,11 +447,7 @@ Elles sont notamment utilisées pour étudier :
 
 Les notebooks contiennent les principales visualisations utilisées pour l'analyse.
 
-Le dossier suivant est prévu pour regrouper les visualisations exportées :
 
-```text
-visualizations/
-```
 
 ---
 
